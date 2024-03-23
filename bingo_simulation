@@ -153,7 +153,7 @@ end
 #Given result dictionary plot histogram of individual numbers before finishing
 function plot_simulation_results(res::Vector{Int64}, iterations::Int64)
 	histogram(res, label="Turns before finish", bins=100)
-	vline!([mode(res)], label="Mode = $(mode(res))", linewidth=5)
+	vline!([median(res)], label="Meidan = $(median(res))", linewidth=5)
 	xlims!(0, 100)
 	title!("Number of turns before finish in bingo for $(iterations) steps.")
 	xlabel!("Turns")
@@ -177,6 +177,38 @@ begin
 	res = simulate_bingo_n_steps(iterations)
 	plot_simulation_results(res, iterations)
 end
+
+# ╔═╡ f7434e99-fce2-48c1-b213-eef55acb3eab
+@htl("""
+<h2>Evolution of average trough simulations</h2>
+<li>Let's plot, how the average of the steps to finish looks like over the time.
+""")
+
+# ╔═╡ 27eca16b-305b-4465-98da-c2e9ece4d3e6
+#Given vector of values, plot how their average converges iteratively
+function iterative_average_plot(finishes::Vector{Int64})
+	val = 0
+	plot_seq::Vector{Real} = Vector{Real}()
+	for i in 1:length(finishes)
+		val += finishes[i]
+		push!(plot_seq, val//i)
+	end
+	plot(plot_seq, label="Finished turns average")
+	xlabel!("Simulations")
+	ylabel!("Mean")
+	ylims!(50, 60)
+	hline!([55], label="55")
+	title!("Mean convergence for 5000 simulations")
+end
+
+# ╔═╡ 7fea8c92-38c7-416f-8ea1-66c89f41236e
+iterative_average_plot(simulate_bingo_n_steps(5000))
+
+# ╔═╡ 60bd0061-c4bf-4fcb-af3f-df490b392cc9
+@htl("""
+<h2>Convergence</h2>
+We can visually evaluate, that average does converge to the value of 55. Given the histogram above, we can suspect, that values do follow <b>normal distribution</b>. This suspicion can be proved by CLT (central limit theorem), but we can also confirm, that our distribution follows normal one by some statistical tests.
+""")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1407,5 +1439,9 @@ version = "1.4.1+1"
 # ╟─42341764-74d6-4b3f-98d1-17200dadca2b
 # ╠═3f267f0a-98d0-4835-9e7b-c39acfc59a32
 # ╟─f4d8ffd2-85bc-4c4a-916e-385667f26946
+# ╟─f7434e99-fce2-48c1-b213-eef55acb3eab
+# ╟─27eca16b-305b-4465-98da-c2e9ece4d3e6
+# ╟─7fea8c92-38c7-416f-8ea1-66c89f41236e
+# ╟─60bd0061-c4bf-4fcb-af3f-df490b392cc9
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
