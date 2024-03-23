@@ -12,6 +12,8 @@ begin
 	using HypertextLiteral
 	using Distributions
 	using Test
+
+	const CARD_SIZE::Int64 = 5
 end
 
 # ╔═╡ 5b4c0325-2d01-4cef-8f7d-9ea6960a1fdd
@@ -27,7 +29,15 @@ end
 # ╔═╡ 50796faa-a01b-411e-84fb-63500b390274
 #Init filled bingo card as 5x5 matrix of values
 function init_bingo_card()
-	card = rand(1:100, 5,5)
+	choices::Set{Int64} = Set(1:100)
+	card = Matrix{Int64}(undef, CARD_SIZE, CARD_SIZE)
+	for i in 1:CARD_SIZE
+		for j in 1:CARD_SIZE
+			picked = rand(choices)
+			card[i,j] = picked
+			delete!(choices, picked)
+		end
+	end
 	card[3,3] = 0
 	return card
 end
@@ -52,7 +62,7 @@ function is_finished(card::Matrix{Int64})
 			flagd1 = false
 		end
 		#Reverse diagonal check
-		if !(card[i, 6 - i] == 0)
+		if !(card[i, (CARD_SIZE + 1) - i] == 0)
 			flagd2 = false
 		end
 	end
@@ -66,6 +76,7 @@ end
 <ul>Remember, that we are going to mark crossed out numbers by replacing them with 0 for efficient computations.</ul>
 
 <h2>Test is_finished() function</h2>
+Let's test our written is_finished() function if it works correctly.
 
 """)
 
@@ -82,6 +93,53 @@ end
 	@test is_finished(finished_rev_diag) == true
 	@test is_finished(non_finished) == false
 end
+
+# ╔═╡ 99dd985b-eb6c-4988-a24a-edce663e3963
+@htl("""
+<h1>Bingo game iterative simulation</h1>
+<ul>In this section, we will simulate continual drawing of 100 numbers until we get finished. </ul>
+<ul>Individual results will be kept in a map with key - number of steps before finished and key will be number of occurences in simulation.</ul>
+""")
+
+# ╔═╡ 5795ca33-3b1b-4040-b774-c4b9d8add838
+#Cross out given number if present in the card
+function cross_out_num!(card::Matrix{Int64}, num::Int64)
+	for i in 1:CARD_SIZE
+		for j in 1:CARD_SIZE
+			if (card[i,j] == num)
+				card[i,j] = 0
+			end
+		end
+	end
+end
+
+# ╔═╡ c40b0e34-96a4-417d-8aa3-c59a65f63e3b
+#Return hash map of finished states and their occurences in n simulations of bingo
+function simulate_bingo_n_steps(n::Int64)
+	res::Dict{Int64, Int64} = Dict{Int64, Int64}()
+	for i in 1:n
+		card = init_bingo_card()
+		not_drawn_nums::Set{Int64} = Set{Int64}(1:100)
+		iter::Int64 = 0
+		while !is_finished(card)
+			picked = rand(not_drawn_nums)
+			delete!(not_drawn_nums, picked)
+			cross_out_num!(card, picked)
+			iter += 1
+		end
+		# Append res to the hash table
+		p = get(res, iter, 0)
+		if p == 0 
+			res[iter] = 1
+		else 
+			res[iter] = p + 1
+		end
+	end
+	return res
+end
+
+# ╔═╡ 9b63dc68-0153-4444-a4f1-d08158af12b6
+simulate_bingo_n_steps(10)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1304,5 +1362,9 @@ version = "1.4.1+1"
 # ╠═6113dda8-90d3-4c79-8eb0-bb161641fe20
 # ╟─dbd14e1b-c8ba-4c0a-b4c5-743795320509
 # ╟─a1b899ae-8764-4b7a-8b79-c34f5ade4719
+# ╟─99dd985b-eb6c-4988-a24a-edce663e3963
+# ╠═5795ca33-3b1b-4040-b774-c4b9d8add838
+# ╠═c40b0e34-96a4-417d-8aa3-c59a65f63e3b
+# ╠═9b63dc68-0153-4444-a4f1-d08158af12b6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
