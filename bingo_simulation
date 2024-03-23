@@ -11,6 +11,7 @@ begin
 	using PlutoUI
 	using HypertextLiteral
 	using Distributions
+	using Test
 end
 
 # ╔═╡ 5b4c0325-2d01-4cef-8f7d-9ea6960a1fdd
@@ -32,7 +33,54 @@ function init_bingo_card()
 end
 
 # ╔═╡ 6113dda8-90d3-4c79-8eb0-bb161641fe20
+#Return true if bingo card is finished
+#Return false if bingo card is not yet finished
 function is_finished(card::Matrix{Int64})
+	#Flag that does monitor diagonal finished state
+	flagd1::Bool = true
+	flagd2::Bool = true
+	#We mark crossed out tiles as 0, since we have only positive numbers in bingo
+	#sum of its rows will only give 0 if all tiles have been crossed out
+	for i in 1:5
+		if (sum(card[i,:]) == 0)
+			return true
+		end
+		if (sum(card[:,i]) == 0)
+			return true
+		end 
+		if !(card[i,i] == 0)
+			flagd1 = false
+		end
+		#Reverse diagonal check
+		if !(card[i, 6 - i] == 0)
+			flagd2 = false
+		end
+	end
+	#We have two possible diagonals
+	return flagd1 || flagd2
+end
+
+# ╔═╡ dbd14e1b-c8ba-4c0a-b4c5-743795320509
+@htl("""
+<ul>We have created two functions. One does create a random bingo card and second will check, if it is finished. </ul>
+<ul>Remember, that we are going to mark crossed out numbers by replacing them with 0 for efficient computations.</ul>
+
+<h2>Test is_finished() function</h2>
+
+""")
+
+# ╔═╡ a1b899ae-8764-4b7a-8b79-c34f5ade4719
+@testset "Is finished card test" begin
+	finished_row = [0 0 0 0 0; 1 2 3 4 5; 1 2 3 4 5; 1 2 3 4 5; 1 2 3 4 5;]
+	finished_col = [0 0 0 2 0; 0 2 3 4 5; 0 2 3 4 5; 0 2 3 4 5; 0 2 3 4 5;]
+	finished_diag = [0 0 0 2 0; 1 0 3 4 5; 0 2 0 4 5; 0 2 3 0 5; 0 2 3 4 0;]
+	finished_rev_diag = [1 2 3 4 0; 1 0 3 0 5; 0 2 0 4 5; 0 0 3 0 5; 0 2 3 4 0;]
+	non_finished = [1 2 3 4 0; 1 0 3 0 5; 0 2 0 4 5; 0 0 3 0 5; 1 2 3 4 7;]
+	@test is_finished(finished_row) == true
+	@test is_finished(finished_row) == true
+	@test is_finished(finished_diag) == true
+	@test is_finished(finished_rev_diag) == true
+	@test is_finished(non_finished) == false
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -43,6 +91,7 @@ HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Distributions = "~0.25.107"
@@ -57,7 +106,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.1"
 manifest_format = "2.0"
-project_hash = "0e11503873f5c098bfb5e5d04a742aae7522fb58"
+project_hash = "c724c011fdeb86db3ae122225e0874ba58770eda"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1253,5 +1302,7 @@ version = "1.4.1+1"
 # ╟─5b4c0325-2d01-4cef-8f7d-9ea6960a1fdd
 # ╠═50796faa-a01b-411e-84fb-63500b390274
 # ╠═6113dda8-90d3-4c79-8eb0-bb161641fe20
+# ╟─dbd14e1b-c8ba-4c0a-b4c5-743795320509
+# ╟─a1b899ae-8764-4b7a-8b79-c34f5ade4719
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
