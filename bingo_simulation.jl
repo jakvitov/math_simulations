@@ -139,6 +139,8 @@ function simulate_bingo_n_steps(n::Int64)
 		end
 		# Append res to the hash table
 		push!(res, iter)
+		#print("\n")
+		#show(stdout, "text/plain", card) 
 	end
 	return res
 end
@@ -202,13 +204,43 @@ function iterative_average_plot(finishes::Vector{Int64})
 end
 
 # ╔═╡ 7fea8c92-38c7-416f-8ea1-66c89f41236e
-iterative_average_plot(simulate_bingo_n_steps(5000))
+begin 
+	smaller_simulation = simulate_bingo_n_steps(5000)
+	iterative_average_plot(smaller_simulation)
+end
 
 # ╔═╡ 60bd0061-c4bf-4fcb-af3f-df490b392cc9
 @htl("""
 <h2>Convergence</h2>
 We can visually evaluate, that average does converge to the value of 55. Given the histogram above, we can suspect, that values do follow <b>normal distribution</b>. This suspicion can be proved by CLT (central limit theorem), but we can also confirm, that our distribution follows normal one by some statistical tests.
 """)
+
+# ╔═╡ 1d8b3607-a1f5-4125-8acf-423900082a78
+@htl("""
+<h2>Bingo for n players</h2>
+<ul>Question: given n players, return mean number of turns, before first wins.</ul>
+<ul>For such simulation, we will make use of the CLT and approximate turns before finish of each player with normal distribution</ul>
+<ul>For such approximation, we first need to get standard deviation (std) of the turns before win.</ul>
+""")
+
+# ╔═╡ e7462e89-617a-4566-bbc5-4a984166dbd5
+#Given result of simulations plot the evolution of variance 
+function plot_variance_evolution(turns::Vector{Int64})
+	stds::Vector{Float64} = Vector{Float64}()
+	for i in 1:length(turns)
+		push!(stds, sqrt(var(turns[1:i])))
+	end
+
+	plot(stds, label="Finished turns std")
+	xlabel!("Simulations")
+	ylabel!("Standard deviation")
+	ylims!(10, 16)
+	hline!([13.3], label="13.3")
+	title!("Std convergence for 5000 simulations")
+end
+
+# ╔═╡ 33f28eb6-b3a2-4c89-9929-4e9e75bed9f1
+plot_variance_evolution(smaller_simulation)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1440,8 +1472,11 @@ version = "1.4.1+1"
 # ╠═3f267f0a-98d0-4835-9e7b-c39acfc59a32
 # ╟─f4d8ffd2-85bc-4c4a-916e-385667f26946
 # ╟─f7434e99-fce2-48c1-b213-eef55acb3eab
-# ╟─27eca16b-305b-4465-98da-c2e9ece4d3e6
-# ╟─7fea8c92-38c7-416f-8ea1-66c89f41236e
+# ╠═27eca16b-305b-4465-98da-c2e9ece4d3e6
+# ╠═7fea8c92-38c7-416f-8ea1-66c89f41236e
 # ╟─60bd0061-c4bf-4fcb-af3f-df490b392cc9
+# ╟─1d8b3607-a1f5-4125-8acf-423900082a78
+# ╠═e7462e89-617a-4566-bbc5-4a984166dbd5
+# ╟─33f28eb6-b3a2-4c89-9929-4e9e75bed9f1
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
