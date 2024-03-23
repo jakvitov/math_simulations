@@ -4,6 +4,16 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+end
+
 # ╔═╡ effb6827-ceca-469b-aa1c-3806cb366285
 begin
 	using LinearAlgebra
@@ -143,17 +153,29 @@ end
 #Given result dictionary plot histogram of individual numbers before finishing
 function plot_simulation_results(res::Vector{Int64}, iterations::Int64)
 	histogram(res, label="Turns before finish", bins=100)
+	vline!([mode(res)], label="Mode = $(mode(res))", linewidth=5)
 	xlims!(0, 100)
 	title!("Number of turns before finish in bingo for $(iterations) steps.")
 	xlabel!("Turns")
 	ylabel!("Occurences")
 end
 
+# ╔═╡ 42341764-74d6-4b3f-98d1-17200dadca2b
+@htl("""
+<h1>Interactive simulation</h1>
+Chose number of simulations by the slider bellow and simulation histogram will be generated.
+""")
+
+# ╔═╡ 3f267f0a-98d0-4835-9e7b-c39acfc59a32
+@bind iterations Slider(1:100000)
+
 # ╔═╡ f4d8ffd2-85bc-4c4a-916e-385667f26946
 begin
-iterations = 10
-res = simulate_bingo_n_steps(iterations)
-plot_simulation_results(res, iterations)
+	if iterations == nothing 
+		return
+	end
+	res = simulate_bingo_n_steps(iterations)
+	plot_simulation_results(res, iterations)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1380,8 +1402,10 @@ version = "1.4.1+1"
 # ╠═99dd985b-eb6c-4988-a24a-edce663e3963
 # ╠═5795ca33-3b1b-4040-b774-c4b9d8add838
 # ╠═c40b0e34-96a4-417d-8aa3-c59a65f63e3b
-# ╠═9b63dc68-0153-4444-a4f1-d08158af12b6
+# ╟─9b63dc68-0153-4444-a4f1-d08158af12b6
 # ╠═bd4dfaf4-6d59-4f0d-a42a-1d66175c29f0
-# ╠═f4d8ffd2-85bc-4c4a-916e-385667f26946
+# ╟─42341764-74d6-4b3f-98d1-17200dadca2b
+# ╠═3f267f0a-98d0-4835-9e7b-c39acfc59a32
+# ╟─f4d8ffd2-85bc-4c4a-916e-385667f26946
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
