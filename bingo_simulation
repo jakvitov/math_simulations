@@ -98,7 +98,7 @@ end
 @htl("""
 <h1>Bingo game iterative simulation</h1>
 <ul>In this section, we will simulate continual drawing of 100 numbers until we get finished. </ul>
-<ul>Individual results will be kept in a map with key - number of steps before finished and key will be number of occurences in simulation.</ul>
+<ul>Individual results will be kept in a vector, so we can plot them later.</ul>
 """)
 
 # ╔═╡ 5795ca33-3b1b-4040-b774-c4b9d8add838
@@ -116,7 +116,7 @@ end
 # ╔═╡ c40b0e34-96a4-417d-8aa3-c59a65f63e3b
 #Return hash map of finished states and their occurences in n simulations of bingo
 function simulate_bingo_n_steps(n::Int64)
-	res::Dict{Int64, Int64} = Dict{Int64, Int64}()
+	res::Vector = Vector{Int64}()
 	for i in 1:n
 		card = init_bingo_card()
 		not_drawn_nums::Set{Int64} = Set{Int64}(1:100)
@@ -128,18 +128,33 @@ function simulate_bingo_n_steps(n::Int64)
 			iter += 1
 		end
 		# Append res to the hash table
-		p = get(res, iter, 0)
-		if p == 0 
-			res[iter] = 1
-		else 
-			res[iter] = p + 1
-		end
+		push!(res, iter)
 	end
 	return res
 end
 
 # ╔═╡ 9b63dc68-0153-4444-a4f1-d08158af12b6
-simulate_bingo_n_steps(10)
+@htl("""
+<h2>Plotting</h2>
+<ul>We created a function, that will simulate given scenario with n-attempts. How let's create a function to plot the results. </ul>
+""")
+
+# ╔═╡ bd4dfaf4-6d59-4f0d-a42a-1d66175c29f0
+#Given result dictionary plot histogram of individual numbers before finishing
+function plot_simulation_results(res::Vector{Int64}, iterations::Int64)
+	histogram(res, label="Turns before finish", bins=100)
+	xlims!(0, 100)
+	title!("Number of turns before finish in bingo for $(iterations) steps.")
+	xlabel!("Turns")
+	ylabel!("Occurences")
+end
+
+# ╔═╡ f4d8ffd2-85bc-4c4a-916e-385667f26946
+begin
+iterations = 10
+res = simulate_bingo_n_steps(iterations)
+plot_simulation_results(res, iterations)
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1362,9 +1377,11 @@ version = "1.4.1+1"
 # ╠═6113dda8-90d3-4c79-8eb0-bb161641fe20
 # ╟─dbd14e1b-c8ba-4c0a-b4c5-743795320509
 # ╟─a1b899ae-8764-4b7a-8b79-c34f5ade4719
-# ╟─99dd985b-eb6c-4988-a24a-edce663e3963
+# ╠═99dd985b-eb6c-4988-a24a-edce663e3963
 # ╠═5795ca33-3b1b-4040-b774-c4b9d8add838
 # ╠═c40b0e34-96a4-417d-8aa3-c59a65f63e3b
 # ╠═9b63dc68-0153-4444-a4f1-d08158af12b6
+# ╠═bd4dfaf4-6d59-4f0d-a42a-1d66175c29f0
+# ╠═f4d8ffd2-85bc-4c4a-916e-385667f26946
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
