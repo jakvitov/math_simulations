@@ -188,7 +188,7 @@ end
 
 # ╔═╡ 27eca16b-305b-4465-98da-c2e9ece4d3e6
 #Given vector of values, plot how their average converges iteratively
-function iterative_average_plot(finishes::Vector{Int64})
+function iterative_average_plot(finishes::Vector{Int64}, steps::Int64)
 	val = 0
 	plot_seq::Vector{Real} = Vector{Real}()
 	for i in 1:length(finishes)
@@ -200,13 +200,7 @@ function iterative_average_plot(finishes::Vector{Int64})
 	ylabel!("Mean")
 	ylims!(50, 60)
 	hline!([55], label="55")
-	title!("Mean convergence for 5000 simulations")
-end
-
-# ╔═╡ 7fea8c92-38c7-416f-8ea1-66c89f41236e
-begin 
-	smaller_simulation = simulate_bingo_n_steps(5000)
-	iterative_average_plot(smaller_simulation)
+	title!("Mean convergence for $(steps) simulations")
 end
 
 # ╔═╡ 60bd0061-c4bf-4fcb-af3f-df490b392cc9
@@ -225,7 +219,7 @@ We can visually evaluate, that average does converge to the value of 55. Given t
 
 # ╔═╡ e7462e89-617a-4566-bbc5-4a984166dbd5
 #Given result of simulations plot the evolution of variance 
-function plot_variance_evolution(turns::Vector{Int64})
+function plot_variance_evolution(turns::Vector{Int64}, steps::Int64)
 	stds::Vector{Float64} = Vector{Float64}()
 	for i in 1:length(turns)
 		push!(stds, sqrt(var(turns[1:i])))
@@ -236,11 +230,17 @@ function plot_variance_evolution(turns::Vector{Int64})
 	ylabel!("Standard deviation")
 	ylims!(10, 16)
 	hline!([13.3], label="13.3")
-	title!("Std convergence for 5000 simulations")
+	title!("Std convergence for $(steps) simulations")
+end
+
+# ╔═╡ 7fea8c92-38c7-416f-8ea1-66c89f41236e
+begin 
+	smaller_simulation = simulate_bingo_n_steps(n_steps)
+	iterative_average_plot(smaller_simulation, n_steps)
 end
 
 # ╔═╡ 33f28eb6-b3a2-4c89-9929-4e9e75bed9f1
-plot_variance_evolution(smaller_simulation)
+plot_variance_evolution(smaller_simulation, n_steps)
 
 # ╔═╡ df36b4a6-0546-4770-a6fb-5f8c51a83a92
 @htl("""
@@ -261,8 +261,14 @@ end
 Now it's time to evaluate loss of our model using the MSE and RMSE methods.
 """)
 
-# ╔═╡ 03f1b228-fc79-44d6-9411-73b4889c17c9
+# ╔═╡ 85da83ec-99b2-40f9-816c-aa8b57f74c4f
+# ╠═╡ disabled = true
+#=╠═╡
+@bind n_steps Slider(1:10000)
+  ╠═╡ =#
 
+# ╔═╡ dc0aed50-6691-4249-a7fe-e0d52d9afd83
+@bind n_steps Slider(1:10000)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1717,14 +1723,15 @@ version = "1.4.1+1"
 # ╟─f4d8ffd2-85bc-4c4a-916e-385667f26946
 # ╟─f7434e99-fce2-48c1-b213-eef55acb3eab
 # ╠═27eca16b-305b-4465-98da-c2e9ece4d3e6
-# ╠═7fea8c92-38c7-416f-8ea1-66c89f41236e
+# ╠═85da83ec-99b2-40f9-816c-aa8b57f74c4f
+# ╟─7fea8c92-38c7-416f-8ea1-66c89f41236e
 # ╟─60bd0061-c4bf-4fcb-af3f-df490b392cc9
 # ╟─1d8b3607-a1f5-4125-8acf-423900082a78
 # ╠═e7462e89-617a-4566-bbc5-4a984166dbd5
+# ╠═dc0aed50-6691-4249-a7fe-e0d52d9afd83
 # ╟─33f28eb6-b3a2-4c89-9929-4e9e75bed9f1
 # ╟─df36b4a6-0546-4770-a6fb-5f8c51a83a92
 # ╟─54ae436c-f28b-4c2c-ba36-004cd4572ac9
 # ╟─8a1ea5ac-be01-4251-b14b-ae4a90ec7293
-# ╠═03f1b228-fc79-44d6-9411-73b4889c17c9
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
